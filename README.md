@@ -5,8 +5,8 @@
 ---
 ## To do task 
 - [x] Labels 
-- [] [Vòng sơ loại]()
-- [] [Vòng chung kết]()
+- [ ] [Vòng sơ loại]()
+- [ ] Vòng chung kết
 ---
 
 ## Setup
