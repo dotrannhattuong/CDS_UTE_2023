@@ -6,7 +6,7 @@
 ## To do task 
 - [x] Labels 
 - [x] [Vòng sơ loại](https://github.com/NguyenHoangAnhTuanute/client_only_segment)
-- [ ] Vòng chung kết
+- [ ] [Vòng chung kết] (https://github.com/NguyenHoangAnhTuanute/client_segment_OD)
 ---
 
 ## Setup
