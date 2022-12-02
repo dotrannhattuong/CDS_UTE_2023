@@ -5,7 +5,7 @@
 ---
 ## To do task 
 - [x] Labels 
-- [ ] [Vòng sơ loại]()
+- [x] [Vòng sơ loại](https://github.com/NguyenHoangAnhTuanute/client_only_segment)
 - [ ] Vòng chung kết
 ---
 
