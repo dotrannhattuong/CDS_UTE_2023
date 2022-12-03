@@ -32,19 +32,15 @@ Dataset_OD_SelfDrivingCar/
 ## Format Data UNET
 
 ```
-Dataset_Lane_Segmentation
+Dataset_Lane_Segmentation/
 │
 ├── train/ 
-│   ├── images/
 │       └── 000000.png - Tất cả các images 
-│├── trainanot/ 
-│   ├── images/
-│       └── 000000.png - Tất cả các labels 
+├── trainanot/ 
+│       └── 000000.png - Tất cả các images  
 ├── val/ 
-│   ├── images/
 │       └── 000000.png - Tất cả các images 
 ├── valanot/ 
-│   ├── images/
 │       └── 000000.png - Tất cả các labels 
 ```
 ---
@@ -52,8 +48,8 @@ Dataset_Lane_Segmentation
 
 | Model   |      Code      |  Reference |
 |----------|:-------------:|:---------:|
-|  YOLOV7  |  [Yolov7.ipynb](https://github.com/anminhhung/pytorch_tutorial/blob/master/CNN/LeNet_5.ipynb)  |  [Yolov7.ipynb](https://github.com/thangnch/MiAI_YOLOv7/blob/main/YOLOv7_Miai_vn.ipynb)  |
-|  YOLOV7E6  |  [Yolov7-e6.ipynb](https://github.com/anminhhung/pytorch_tutorial/blob/master/CNN/LeNet_5.ipynb)  |  [Yolov7-e6.ipynb](https://github.com/WongKinYiu/yolov7)  |
-|  UNET |  [Unet.ipynb](https://github.com/anminhhung/pytorch_tutorial/blob/master/CNN/AlexNet.ipynb)  |  [Unet.ipynb](https://github.com/milesial/Pytorch-UNet)  |
+|  YOLOV7  |  [Yolov7.ipynb](https://github.com/nguyenhuongquynh2607/Model/blob/main/OD_yolov7.ipynb)  |  [Yolov7](https://github.com/thangnch/MiAI_YOLOv7/blob/main/YOLOv7_Miai_vn.ipynb)  |
+|  YOLOV7E6  |  [Yolov7-e6.ipynb](https://github.com/nguyenhuongquynh2607/Model/blob/main/OD_yolov7e6.ipynb)  |  [Yolov7-e6](https://github.com/WongKinYiu/yolov7)  |
+|  UNET |  [Unet.ipynb](https://github.com/nguyenhuongquynh2607/Model/blob/main/Lane_Segmentation.ipynb)  |  [Unet](https://github.com/milesial/Pytorch-UNet)  |
 
 ---
