@@ -37,7 +37,7 @@ Dataset_Lane_Segmentation/
 ├── train/ 
 │       └── 000000.png - Tất cả các images 
 ├── trainanot/ 
-│       └── 000000.png - Tất cả các images  
+│       └── 000000.png - Tất cả các lables  
 ├── val/ 
 │       └── 000000.png - Tất cả các images 
 ├── valanot/ 
