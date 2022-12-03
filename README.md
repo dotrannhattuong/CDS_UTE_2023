@@ -5,8 +5,8 @@
 ---
 ## To do task 
 - [x] Labels 
-- [x] [Vòng sơ loại](https://github.com/NguyenHoangAnhTuanute/client_only_segment)
-- [ ] [Vòng chung kết](https://github.com/NguyenHoangAnhTuanute/client_segment_OD)
+- [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/Segment_OD/client_vong_so_loai.py)
+- [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/Segment_OD/client_vong_chung_ket.py)
 ---
 
 ## Setup
