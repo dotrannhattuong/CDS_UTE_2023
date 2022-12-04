@@ -17,6 +17,7 @@ from torchvision import transforms
 from PIL import Image
 from numpy import random
 from pathlib import Path
+from Controller_Tuan import controller
 #from model import build_unet
 
 # Create a socket object
@@ -33,7 +34,7 @@ S = 0
 err_arr = np.zeros(5)
 def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images')
-    parser.add_argument('--model', '-m', default='checkpoint_epoch300.pth', metavar='FILE',
+    parser.add_argument('--model', '-m', default='weights/checkpoint_epoch300.pth', metavar='FILE',
                         help='Specify the file in which the model is stored')
     parser.add_argument('--mask-threshold', '-t', type=float, default=0.5,
                         help='Minimum probability value to consider a mask pixel white')
@@ -75,7 +76,7 @@ model.load_state_dict(torch.load(args.model, map_location=device))
 device_od = '0'
 device_od = select_device(device_od)
 print(device_od)
-model_od = attempt_load('test.pt', map_location=device_od)  # load FP32 model
+model_od = attempt_load('weights/test.pt', map_location=device_od)  # load FP32 model
 def detect(source, device, img_size, iou_thres, conf_thres, net):
     net.eval()
     stride = int(net.stride.max())  # model stride
@@ -115,12 +116,6 @@ def PID(err, Kp, Ki, Kd):
     I = Ki*np.sum(err_arr)*delta_t
     angle = P + I + D
     return int(angle)
-def mask_lane(img, val):
-    mask = np.zeros_like(img)
-    mask_color = (255,)*1
-    cv2.fillPoly(mask, val, mask_color)
-    out = cv2.bitwise_and(img, mask)
-    return out
 def remove_small_contours(image):
     image_binary = np.zeros((image.shape[0], image.shape[1]), np.uint8)
     contours = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
@@ -129,6 +124,7 @@ def remove_small_contours(image):
     return image_remove
 right = 0
 left = 0
+straight = 0
 if __name__ == "__main__":
     try:
         while True:
@@ -187,69 +183,18 @@ if __name__ == "__main__":
                 out = np.array(result)
                 img_remove = remove_small_contours(out)
                 edges = img_remove
-                lineRow = edges[line,:]
-                for x,y in enumerate(lineRow):
-                    if y==255:
-                        arr.append(x)
-                arrmax=max(arr)
-                arrmin=min(arr)
-                center = int((arrmax + arrmin)/2)
-                error = int(edges.shape[1]/2) - center
-                angle = -PID(error, 0.29, 0.00, 0.005)#0.3 fps 25 - 30
-                """xu li re phai nga ba thang"""
-                if (right==1):
-                    time.sleep(0.5)
-                    right = 0
-                if (conf_OD > 0.6):
-                    if (cls_OD==1):
-                        if (S > 450):     
-                            speed = -12
-                            angle = 25
-                            right = 1
-                """xu li re trai nga ba thang"""
-                if (left==1):
-                    time.sleep(0.5)
-                    left = 0
-                if (conf_OD > 0.6):
-                    if (cls_OD==8):
-                        if (S > 650):     
-                            speed = -5
-                            angle = -25
-                            left = 1
-                if (right==0 and left==0):
-                    if (abs(float(current_angle))<3):
-                        if (float(current_speed)> 45):
-                            speed = 0
-                        else: speed = 150
-                    elif (abs(float(current_angle))<7 and abs(float(current_angle))>2):
-                        if (float(current_speed)< 42):
-                            speed = 150
-                        elif (float(current_speed)< 44):
-                            speed = 0
-                        else: speed = -10
-                    elif (abs(float(current_angle))>6 and abs(float(current_angle))<11):
-                        if (float(current_speed)< 40):
-                            speed = 150
-                        elif (float(current_speed)< 42):
-                            speed = 0
-                        else: speed = -13
-                    else:
-                        if (float(current_speed)< 38):
-                            speed = 150
-                        elif (float(current_speed)< 40):
-                            speed = 0
-                        else: speed = -15
-                # cv2.circle(edges,(arrmin,line),5,(0,0,0),3)
-                # cv2.circle(edges,(arrmax,line),5,(0,0,0),3)
-                # cv2.line(edges,(center,line),(int(edges.shape[1]/2),edges.shape[0]),(0,0,0),3)
+                """Controller"""
+                angle, speed, right, left, straight = controller(edges, PID, current_angle=current_angle, current_speed=current_speed, 
+                                          conf_OD=conf_OD, cls_OD=cls_OD, S=S, right=right, left=left, straight=straight)
+                """"""
                 cv2.imshow("IMG", edges)
                 key = cv2.waitKey(1)
-                # print('angle', angle)
                 print(S, conf_OD, cls_OD)
                 end = time.time()
                 fps = 1 / (end - start)
                 print(fps)
             except Exception as er:
+                speed = -10
                 print(er)
                 pass
             
