@@ -102,8 +102,8 @@ def detect(source, device, img_size, iou_thres, conf_thres, net):
                     #lay gia tri cua OD
                     label_OD = f'{names[int(cls)]}' 
                     # plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=1)
-                return float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3]), float(conf), label_OD, im0
-            else: return 'n' , 'o', 't', 'h', 'i', 'n', 'g'
+                return float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3]), float(conf), float(cls)
+            else: return 0, 0, 0, 0, 0, 0
 def PID(err, Kp, Ki, Kd):
     global pre_t
     err_arr[1:] = err_arr[0:-1]
@@ -115,12 +115,20 @@ def PID(err, Kp, Ki, Kd):
     I = Ki*np.sum(err_arr)*delta_t
     angle = P + I + D
     return int(angle)
+def mask_lane(img, val):
+    mask = np.zeros_like(img)
+    mask_color = (255,)*1
+    cv2.fillPoly(mask, val, mask_color)
+    out = cv2.bitwise_and(img, mask)
+    return out
 def remove_small_contours(image):
     image_binary = np.zeros((image.shape[0], image.shape[1]), np.uint8)
     contours = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
     mask = cv2.drawContours(image_binary, [max(contours, key=cv2.contourArea)], -1, (255, 255, 255), -1)
     image_remove = cv2.bitwise_and(image, image, mask=mask)
     return image_remove
+right = 0
+left = 0
 if __name__ == "__main__":
     try:
         while True:
@@ -144,18 +152,24 @@ if __name__ == "__main__":
             try:
                 start = time.time()
                 decoded = cv2.imdecode(np.frombuffer(data, np.uint8), -1)
-
-                img_OD = cv2.resize(decoded,(320, 160))
-                image_name = "img_OD.jpg"
-                cv2.imwrite(image_name, img_OD)
-
-                image = decoded[120:,:]
-                image = cv2.resize(image, (160, 80))
-                image_resize = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                try:
+                    img_OD = cv2.resize(decoded,(320, 160))
+                    image_name = "img_OD.jpg"
+                    cv2.imwrite(image_name, img_OD)
+                except Exception as er:
+                    print(er)
+                    pass
+                try:
+                    image = decoded[120:,:]
+                    image = cv2.resize(image, (160, 80))
+                    image_resize = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                except Exception as er:
+                    print(er)
+                    pass
                 """DETECT OBJECT"""
                 torch.cuda.is_available()
                 with torch.no_grad():
-                    xmin, ymin, xmax, ymax, conf_OD, name, img_detect = detect('img_OD.jpg', device, img_size=320, iou_thres=0.25, conf_thres=0.25, net=model_od)
+                    xmin, ymin, xmax, ymax, conf_OD, cls_OD = detect('img_OD.jpg', device, img_size=320, iou_thres=0.25, conf_thres=0.25, net=model_od)
                 try:
                     S = (xmax - xmin)*(ymax - ymin)  # S>1000, nga ba arrmax = 160
                 except Exception as er:
@@ -173,7 +187,6 @@ if __name__ == "__main__":
                 out = np.array(result)
                 img_remove = remove_small_contours(out)
                 edges = img_remove
-
                 lineRow = edges[line,:]
                 for x,y in enumerate(lineRow):
                     if y==255:
@@ -182,53 +195,57 @@ if __name__ == "__main__":
                 arrmin=min(arr)
                 center = int((arrmax + arrmin)/2)
                 error = int(edges.shape[1]/2) - center
-                #err duong xe dang ben phai va can sang trai nen de am de nguoc lai, goc duong la dg bi sang phai
-                angle = -PID(error, 0.28, 0.00, 0.005)#0.3 fps 25 - 30
-                # if (angle > 0 and angle < 5):
-                #     set_speed = 60
-                # elif (angle > 20):
-                #     set_speed = 30
-                # else: set_speed = 53
-                if (abs(float(current_angle))<3):
-                    if (float(current_speed)> 53):
-                        speed = 0
-                    else: speed = 150
-                elif (abs(float(current_angle))<7 and abs(float(current_angle))>2):
-                    if (float(current_speed)< 47):
-                        speed = 150
-                    elif (float(current_speed)< 50):
-                        speed = 0
-                    else: speed = -5
-                elif (abs(float(current_angle))>6 and abs(float(current_angle))<11):
-                    if (float(current_speed)< 40):
-                        speed = 120
-                    elif (float(current_speed)< 42):
-                        speed = 0
-                    else: speed = -11
-                else:
-                    if (float(current_speed)< 38):
-                        speed = 120
-                    elif (float(current_speed)< 40):
-                        speed = 0
-                    else: speed = -13
-
-
-                # if (float(current_speed) < 45):
-                #     speed = 150
-                # elif (abs(float(current_angle))>5 and float(current_angle)<9):#11
-                #     speed = 0
-                # elif (abs(float(current_angle))>8):#11
-                #     speed = -5
-                # elif (float(current_speed)>set_speed):#53
-                #     speed = 0
-                # else: speed = 150
+                angle = -PID(error, 0.29, 0.00, 0.005)#0.3 fps 25 - 30
+                """xu li re phai nga ba thang"""
+                if (right==1):
+                    time.sleep(0.5)
+                    right = 0
+                if (conf_OD > 0.6):
+                    if (cls_OD==1):
+                        if (S > 450):     
+                            speed = -12
+                            angle = 25
+                            right = 1
+                """xu li re trai nga ba thang"""
+                if (left==1):
+                    time.sleep(0.5)
+                    left = 0
+                if (conf_OD > 0.6):
+                    if (cls_OD==8):
+                        if (S > 650):     
+                            speed = -5
+                            angle = -25
+                            left = 1
+                if (right==0 and left==0):
+                    if (abs(float(current_angle))<3):
+                        if (float(current_speed)> 45):
+                            speed = 0
+                        else: speed = 150
+                    elif (abs(float(current_angle))<7 and abs(float(current_angle))>2):
+                        if (float(current_speed)< 42):
+                            speed = 150
+                        elif (float(current_speed)< 44):
+                            speed = 0
+                        else: speed = -10
+                    elif (abs(float(current_angle))>6 and abs(float(current_angle))<11):
+                        if (float(current_speed)< 40):
+                            speed = 150
+                        elif (float(current_speed)< 42):
+                            speed = 0
+                        else: speed = -13
+                    else:
+                        if (float(current_speed)< 38):
+                            speed = 150
+                        elif (float(current_speed)< 40):
+                            speed = 0
+                        else: speed = -15
                 # cv2.circle(edges,(arrmin,line),5,(0,0,0),3)
                 # cv2.circle(edges,(arrmax,line),5,(0,0,0),3)
                 # cv2.line(edges,(center,line),(int(edges.shape[1]/2),edges.shape[0]),(0,0,0),3)
-                # cv2.imshow("IMG", edges)
-                # key = cv2.waitKey(1)
-                print('angle', angle)
-                print(S, conf_OD, name)
+                cv2.imshow("IMG", edges)
+                key = cv2.waitKey(1)
+                # print('angle', angle)
+                print(S, conf_OD, cls_OD)
                 end = time.time()
                 fps = 1 / (end - start)
                 print(fps)
