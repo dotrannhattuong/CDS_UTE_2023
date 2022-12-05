@@ -34,7 +34,7 @@ S = 0
 err_arr = np.zeros(5)
 def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images')
-    parser.add_argument('--model', '-m', default='weights/checkpoint_epoch300.pth', metavar='FILE',
+    parser.add_argument('--model', '-m', default='checkpoint_epoch300.pth', metavar='FILE',
                         help='Specify the file in which the model is stored')
     parser.add_argument('--mask-threshold', '-t', type=float, default=0.5,
                         help='Minimum probability value to consider a mask pixel white')
@@ -76,7 +76,7 @@ model.load_state_dict(torch.load(args.model, map_location=device))
 device_od = '0'
 device_od = select_device(device_od)
 print(device_od)
-model_od = attempt_load('weights/test.pt', map_location=device_od)  # load FP32 model
+model_od = attempt_load('test.pt', map_location=device_od)  # load FP32 model
 def detect(source, device, img_size, iou_thres, conf_thres, net):
     net.eval()
     stride = int(net.stride.max())  # model stride
