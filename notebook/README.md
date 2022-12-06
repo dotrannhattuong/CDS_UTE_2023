@@ -53,3 +53,11 @@ Dataset_Lane_Segmentation/
 |  UNET |  [Unet.ipynb](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/notebook/Lane_Segmentation.ipynb)  |  [Unet](https://github.com/milesial/Pytorch-UNet)  |
 
 ---
+### Visualize_data:
+
+<p align="center">
+    <img src="images/001.png">
+</p>
+
+---
+
