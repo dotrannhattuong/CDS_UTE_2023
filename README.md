@@ -1,8 +1,20 @@
 <h1><center> CDS_UTE_2023 <br> SELF DRIVING CAR</center></h1>
 
 ## Introduction
+The 2nd contest "Autonomous vehicle using Image Processing and Artificial Intelligence" in 2022 by UTE organizated
+Contest format: Program the car on the simulation software and let the car pass the checkpoints.
+Timeline: 
+    30/12/2022: Vòng loại
 
----
+## SPK Sandbox Team
+Mentor: [Đỗ Trần Nhật Tường](https://github.com/dotrannhattuong)
+Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
+[Nguyễn Hoàng Anh Tuấn](https://github.com/aTunass) 
+[Nguyễn Ngọc Lê](https://github.com/lenguyen45911)
+[Nguyễn Hương Quỳnh](https://github.com/nguyenhuongquynh2607)
+[Trần Hữu Hiếu](https://github.com/HieuTran2019)
+ 
+---)
 ## To do task 
 - [x] Labels 
 - [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_loai.py)
@@ -27,7 +39,8 @@ pip install -r requirements.txt
 - [YoloV7E6]()
 
 ## MAP 2023
-
+- [Map vòng loại](https://drive.google.com/drive/folders/1YZ08SyIzOsEq9X3Bl9fhD_fm3WJKGEdv?fbclid=IwAR04ALaKBTcTBl_B1ZmuNRa-EZLV1aQI_WOY7I8tGBvQYIbQF4tmd3XZaaY)
+- [Map vòng chung kết]()
 ## Training
 
 
