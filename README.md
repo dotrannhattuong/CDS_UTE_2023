@@ -1,7 +1,7 @@
 <h1><center> CDS_UTE_2023 <br> SELF DRIVING CAR</center></h1>
 
 ## Introduction
-The 2nd contest "Autonomous vehicle using Image Processing and Artificial Intelligence" in 2022 by UTE organizated
+The 2nd contest "Self-Driving Car using Image Processing and Artificial Intelligence" in 2022 by UTE organizated
 
 Contest format: Program the car on the simulation software and let the car pass the checkpoints.
 
