@@ -2,16 +2,23 @@
 
 ## Introduction
 The 2nd contest "Autonomous vehicle using Image Processing and Artificial Intelligence" in 2022 by UTE organizated
+
 Contest format: Program the car on the simulation software and let the car pass the checkpoints.
+
 Timeline: 
     30/12/2022: Vòng loại
 
 ## SPK Sandbox Team
 Mentor: [Đỗ Trần Nhật Tường](https://github.com/dotrannhattuong)
+
 Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
+
 [Nguyễn Hoàng Anh Tuấn](https://github.com/aTunass) 
+
 [Nguyễn Ngọc Lê](https://github.com/lenguyen45911)
+
 [Nguyễn Hương Quỳnh](https://github.com/nguyenhuongquynh2607)
+
 [Trần Hữu Hiếu](https://github.com/HieuTran2019)
  
 ---)
