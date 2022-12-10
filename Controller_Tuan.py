@@ -1,16 +1,40 @@
 import time
 import cv2
-def go_straight(arrmax, arrmin, edges):
-    if (arrmax > (edges.shape[1]-30) and arrmin > 15):
-        center = arrmin + 34
-    elif (arrmax < (edges.shape[1]-15) and arrmin < 30):
-        center = arrmax - 34 
+def go_straight(arrmax, arrmin, left_detect, right_detect):
+    if (right_detect==1):
+        center = arrmin + 25
+    elif (left_detect==1):
+        center = arrmax - 25 
     else: center = 1
     return center
+def turn_left(current_speed):
+    if (float(current_speed)>=45):
+        speed= 0
+    elif (float(current_speed>=43)): 
+        speed= 25
+    angle = -25
+    return angle, speed
+def turn_right(current_speed):
+    if (float(current_speed)>=45):
+        speed= 0
+    elif (float(current_speed>=43)): 
+        speed= 25
+    else: speed = 50
+    angle = 25
+    return angle, speed
 def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, right, left, straight):
     """detect duong thang"""
+    S_left = 750
+    S_right = 450 # voi van toc 45
     straightarr = []
-    lineStraight = edges[10,:]
+    line = 15
+    set_speed = 0
+    two_lane=0
+    if (float(current_speed)<44):
+        S_right = 460
+    if (cls_OD==0 and float(current_speed)<47):
+        line = 18
+    lineStraight = edges[5,:]
     for x,y in enumerate(lineStraight):
         if y==255:
             straightarr.append(x)
@@ -24,7 +48,7 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
     """"""
     """detect trai"""
     leftarr = []
-    lineLeft = edges[:,5]
+    lineLeft = edges[:,10]
     for x,y in enumerate(lineLeft):
         if y==255:
             leftarr.append(x)
@@ -40,7 +64,7 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
     """"""
     """detect phai"""
     rightarr = []
-    lineRight = edges[:,155]
+    lineRight = edges[:,150]
     for x,y in enumerate(lineRight):
         if y==255:
             rightarr.append(x)
@@ -56,127 +80,117 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
     ###############################################################################
     ###############################################################################
     arr=[]
-    lineRow = edges[20,:]
+    lineRow = edges[line,:]
     for x,y in enumerate(lineRow):
         if y==255:
             arr.append(x)
     arrmax=max(arr)
     arrmin=min(arr)
     set_point = int(edges.shape[1]/2) 
-    # print(arrmax-arrmin) #67-68, duonh mot lane, 90 duong 2 lane -> arrmax-25, loi gap nga ba, nga tu
+    print('chieu dai duong...................', arrmax-arrmin) 
+    if (conf_OD==0):
+        if (left_detect==1 and right_detect==0 and straight_detect==0 and arrmax >((edges.shape[1]/2) + 10)): #cua trai
+            if (arrmin > 30 and float(current_speed)>51):
+                arrmax = arrmax + 34
+                print('change arrmax')
+        elif (right_detect==1 and left_detect==0 and straight_detect==0 and arrmin < ((edges.shape[1]/2) - 10)): #cua phai
+            if (arrmax < 130 and float(current_speed)>51):
+                arrmin = arrmin - 34
+                print('change arrmin')
     ###############################################################################
-    """detect 2 lane va background"""
-    if ((arrmax - arrmin)>85  and (arrmax-arrmin)<105 and straight_detect==1):
-        twolanearr = []
-        linetwolane = edges[12,:]
-        for x,y in enumerate(linetwolane):
-            if y==255:
-                twolanearr.append(x)
-        two_lane_min = min(twolanearr)
-        two_lane_max = max(twolanearr)
-        if (two_lane_min > 10 and two_lane_max < 150):
-            arrmin = arrmax - 10
-            set_point = int(edges.shape[1]/2) + 20
-            two_lane=1
-            print('duong 2 lane')
-    else: two_lane=0
-    if (arrmax < (edges.shape[1]/2+30) and arrmin > 20 and two_lane==0):
-        center = arrmin + 34 #cho lech de no cua ve
-    elif (arrmin > (edges.shape[1]/2-30) and arrmax < 140 and two_lane==0):
-        center = arrmax - 34 #cho lech de no cua ve
-    else: center = int((arrmax + arrmin)/2)
-    ############################################################################### tra ve set_point, center
-    ###############################################################################
+    center = int((arrmax + arrmin)/2)
     """xu li di thang thang"""
-    if (straight==1 and cls_OD==0):
-        center = go_straight(arrmax=arrmax, arrmin=arrmin, edges=edges)
+    if (straight==1):
+        center = go_straight(arrmax=arrmax, arrmin=arrmin, left_detect=left_detect, right_detect=right_detect)
         if (center==1):
             center = int((arrmax + arrmin)/2)
         straight=0
         print('go straight')
-    if (conf_OD > 0.7):
+    if (conf_OD > 0.75):
         if (cls_OD==2): 
-            if (S>350):
-                straight=1
-    ############################################################################### tra ve center
+            straight=1
     error = set_point - center
-    angle = -PID(error, 0.29, 0.00, 0.005)#0.3 fps 25 - 30
-    ############################################################################### 
-    """xu li re phai nga ba thang tam on, chua fix duong hai lane"""
+    print('error:...............', error)
+    angle = -PID(error, 0.32, 0.0002, 0.007)#0.3 fps 25 - 30
+    ##################################################################################
+    if (arrmax < 110 and arrmin > 50 and two_lane==0 and (arrmax - arrmin)<=45 and line==15):
+        print('bong ram')
+        if (arrmax < 110):
+            arrmax = arrmin + 51
+        else: arrmin = arrmax - 51
+    if (arrmax < 115 and arrmin > 45 and two_lane==0 and (arrmax - arrmin)<=55 and line==17):
+        print('bong ram')
+        if (arrmax < 110):
+            arrmax = arrmin + 61
+        else: arrmin = arrmax - 61
+    if (conf_OD>0): #and cls_OD!=7):
+        set_speed=45
+    """xu li re phai"""
     if (right==1):
-        time.sleep(0.6)
-        right = 0
+        print('speed:......................................................................', float(current_speed))  
+        right=0
+        t1 = time.time()
+        while ((time.time()-t1)<0.5):
+            if ((arrmax-arrmin)>45 and (arrmax-arrmin)<57 and arrmin > 10 and arrmax < 150):
+                print('breaking----------------------', arrmax-arrmin)
+                # break
     if (conf_OD > 0.6):
         if (cls_OD==1):
-            if (S > 405):     
-                speed = -12
-                angle = 25
+            if(arrmax>=140):
+                if (left_detect==1):
+                    S_right=415
+                    arrmin = 60
+                else: angle=-0.5
+            if (S > S_right):   
+                angle, speed = turn_right(current_speed=float(current_speed))
                 right = 1
-    """xu li re trai nga ba thang, chua fix 2 lane"""
+    ##################################################################################
+    """xu li re trai nga"""
     if (left==1):
-        time.sleep(0.5)
+        print('speed ......................................................................:', float(current_speed))
         left = 0
+        t2 = time.time()
+        while ((time.time()-t2)<0.52):
+            if ((arrmax-arrmin)>45 and (arrmax-arrmin)<57 and arrmin > 10 and arrmax < 150):
+                print('breaking----------------------', arrmax-arrmin)
     if (conf_OD > 0.6):
         if (cls_OD==8):
-            if (S > 850):     
-                speed = -3
-                angle = -25
+            if (arrmin==0):
+                if (right_detect==1):
+                    arrmax = 105
+                else: 
+                    arrmax = 150
+                    S_left=800
+                center = int((arrmax + arrmin)/2)
+                error = set_point - center
+                angle = -PID(error, 0.32, 0.0002, 0.007)#0.3 fps 25 - 30
+            if (S > S_left):     
+                angle, speed = turn_left(float(current_speed))
                 left = 1
-    """xu li bien no straight"""
-    if (conf_OD > 0.7):
-        if (cls_OD==5):
-            if (right_detect==1):
-                if (S>450):
-                    speed = -12
-                    angle = 25
-                    right = 1
-            elif (left_detect==1):
-                if (S>650):
-                    speed = -5
-                    angle = -25
-                    left = 1
-    # """xu li bien no turn left"""
-    # if (conf_OD > 0.7):
-    #     if (cls_OD==3):
-    #         if (straight_detect==1):
-    #             k
-    #         elif (right_detect==1):
-    #             if (S>450):
-    #                 speed = -12
-    #                 angle = 25
-                    # right = 1
-            # elif (straight_detect==1):
-            #     if (S>650):
-            #         speed = -5
-            #         angle = -25
-            #         left = 1
-    ############################################################################### tra ve angle and speed
-    if (right==0 and left==0):
-        if (abs(float(current_angle))<3):
-            if (float(current_speed)> 45):
+
+    ################## Control speed by error
+    if (straight==1):
+        speed=150
+    if (right==0 and left ==0):
+        if (set_speed>0):
+            if (float(current_speed)>54):
+                speed = -10
+            elif (float(current_speed)>52 and float(current_speed)<54):
+                speed = -2
+            elif (float(current_speed)>49 and float(current_speed)<52):
+                speed = -1
+            elif(float(current_speed)> set_speed):
                 speed = 0
             else: speed = 150
-        elif (abs(float(current_angle))<7 and abs(float(current_angle))>2):
-            if (float(current_speed)< 40):
-                speed = 150
-            elif (float(current_speed)< 42):
+        elif (float(current_speed)<45):
+            speed=150
+        else: 
+            if (float(current_speed)>58):
                 speed = 0
-            else: speed = -10
-        elif (abs(float(current_angle))>6 and abs(float(current_angle))<11):
-            if (float(current_speed)< 38):
-                speed = 150
-            elif (float(current_speed)< 40):
-                speed = 0
-            else: speed = -13
-        else:
-            if (float(current_speed)< 36):
-                speed = 150
-            elif (float(current_speed)< 38):
-                speed = 0
-            else: speed = -15
-    # cv2.circle(edges,(arrmin,20),5,(0,0,0),2)
-    # cv2.circle(edges,(arrmax,20),5,(0,0,0),2)
-    cv2.line(edges,(center,20),(int(edges.shape[1]/2 + 20),edges.shape[0]),(0,0,0),2)
+            else: speed = -10*abs((error)) + 210
+    cv2.circle(edges,(arrmin,line),5,(0,0,0),2)
+    cv2.circle(edges,(arrmax,line),5,(0,0,0),2)
+    cv2.line(edges,(center,line),(set_point,edges.shape[0]),(0,0,0),2)
     cv2.imshow("IMG", edges)
     key = cv2.waitKey(1)
     return angle, speed, right, left, straight
