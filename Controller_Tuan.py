@@ -1,37 +1,52 @@
 import time
 import cv2
 def go_straight(arrmax, arrmin, left_detect, right_detect):
-    if (right_detect==1):
+    if (right_detect==1 and arrmax>=140 and arrmin>=50):
         center = arrmin + 25
-    elif (left_detect==1):
+    elif (left_detect==1 and arrmin<=20 and arrmax<=130):
         center = arrmax - 25 
     else: center = 1
     return center
-def turn_left(current_speed):
+def turn_left(current_speed, right_detect):
     if (float(current_speed)>=45):
         speed= 0
-    elif (float(current_speed>=43)): 
+    elif (float(current_speed)>=43): 
         speed= 25
-    angle = -25
+    else: speed=50
+    if (right_detect==1):
+        angle = -12
+    else: angle = -16
     return angle, speed
-def turn_right(current_speed):
+def turn_right(current_speed, left_detect):
+    if (left_detect==1):
+        t_right = 0.52
+    else: t_right=0.47
     if (float(current_speed)>=45):
         speed= 0
     elif (float(current_speed>=43)): 
         speed= 25
     else: speed = 50
     angle = 25
-    return angle, speed
+    return angle, speed, t_right
 def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, right, left, straight):
     """detect duong thang"""
-    S_left = 750
-    S_right = 450 # voi van toc 45
+    S_left = 780
+    S_right = 462 # voi van toc 45
     straightarr = []
     line = 15
     set_speed = 0
     two_lane=0
-    if (float(current_speed)<44):
-        S_right = 460
+    t_right = 0.47
+    if (float(current_speed)>45.5):
+        S_right = 454
+    if (float(current_speed)<45 and float(current_speed)>44.5):
+        S_right = 468
+    if (float(current_speed)<44.5 and float(current_speed)>44):
+        S_right = 469
+    if (float(current_speed)<44 and float(current_speed)>43):
+        S_right = 472
+    if (float(current_speed)<43):
+        S_right = 475
     if (cls_OD==0 and float(current_speed)<47):
         line = 18
     lineStraight = edges[5,:]
@@ -99,16 +114,20 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
                 print('change arrmin')
     ###############################################################################
     center = int((arrmax + arrmin)/2)
-    """xu li di thang thang"""
-    if (straight==1):
-        center = go_straight(arrmax=arrmax, arrmin=arrmin, left_detect=left_detect, right_detect=right_detect)
-        if (center==1):
-            center = int((arrmax + arrmin)/2)
-        straight=0
-        print('go straight')
-    if (conf_OD > 0.75):
-        if (cls_OD==2): 
-            straight=1
+    # """xu li di thang thang"""
+    # if (straight==1):
+    #     t3 = time.time()
+    #     while ((time.time()-t3)<0.4):
+    #         speed=150
+    #         print('straighttttttttttt')
+    #     straight=0
+    #     print('go straight')
+    # if (conf_OD > 0.8):
+    #     if (cls_OD==2): 
+    #         center = go_straight(arrmax=arrmax, arrmin=arrmin, left_detect=left_detect, right_detect=right_detect)
+    #         if (center==1):
+    #             center = int((arrmax + arrmin)/2)
+    #         straight=1
     error = set_point - center
     print('error:...............', error)
     angle = -PID(error, 0.32, 0.0002, 0.007)#0.3 fps 25 - 30
@@ -123,26 +142,27 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
         if (arrmax < 110):
             arrmax = arrmin + 61
         else: arrmin = arrmax - 61
-    if (conf_OD>0): #and cls_OD!=7):
+    if (conf_OD>0 and cls_OD!=7 and cls_OD!=2):
         set_speed=45
     """xu li re phai"""
     if (right==1):
         print('speed:......................................................................', float(current_speed))  
         right=0
         t1 = time.time()
-        while ((time.time()-t1)<0.5):
+        while ((time.time()-t1)<t_right):
             if ((arrmax-arrmin)>45 and (arrmax-arrmin)<57 and arrmin > 10 and arrmax < 150):
                 print('breaking----------------------', arrmax-arrmin)
-                # break
-    if (conf_OD > 0.6):
+                #break
+    if (conf_OD > 0.7):
         if (cls_OD==1):
-            if(arrmax>=140):
-                if (left_detect==1):
-                    S_right=415
-                    arrmin = 60
-                else: angle=-0.5
+            if(arrmax>150 and left_detect==0):
+                angle = -0.4
+            if (left_detect==1):
+                set_speed=50
+                S_right=385
+                arrmin = 150
             if (S > S_right):   
-                angle, speed = turn_right(current_speed=float(current_speed))
+                angle, speed, t_right = turn_right(current_speed=float(current_speed), left_detect=left_detect)
                 right = 1
     ##################################################################################
     """xu li re trai nga"""
@@ -150,33 +170,33 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
         print('speed ......................................................................:', float(current_speed))
         left = 0
         t2 = time.time()
-        while ((time.time()-t2)<0.52):
+        while ((time.time()-t2)<0.55):
             if ((arrmax-arrmin)>45 and (arrmax-arrmin)<57 and arrmin > 10 and arrmax < 150):
                 print('breaking----------------------', arrmax-arrmin)
-    if (conf_OD > 0.6):
+    if (conf_OD > 0.7):
         if (cls_OD==8):
             if (arrmin==0):
                 if (right_detect==1):
-                    arrmax = 105
+                    arrmax = 156
                 else: 
-                    arrmax = 150
-                    S_left=800
+                    arrmax = 118
+                    S_left=694
                 center = int((arrmax + arrmin)/2)
                 error = set_point - center
                 angle = -PID(error, 0.32, 0.0002, 0.007)#0.3 fps 25 - 30
             if (S > S_left):     
-                angle, speed = turn_left(float(current_speed))
+                angle, speed = turn_left(current_speed=float(current_speed), right_detect=right_detect)
                 left = 1
 
     ################## Control speed by error
     if (straight==1):
         speed=150
-    if (right==0 and left ==0):
+    if (right==0 and left==0 and straight==0):
         if (set_speed>0):
             if (float(current_speed)>54):
-                speed = -10
+                speed = -15
             elif (float(current_speed)>52 and float(current_speed)<54):
-                speed = -2
+                speed = -5
             elif (float(current_speed)>49 and float(current_speed)<52):
                 speed = -1
             elif(float(current_speed)> set_speed):
@@ -185,7 +205,7 @@ def controller(edges, PID, current_angle, current_speed, conf_OD, cls_OD, S, rig
         elif (float(current_speed)<45):
             speed=150
         else: 
-            if (float(current_speed)>58):
+            if (float(current_speed)>59):
                 speed = 0
             else: speed = -10*abs((error)) + 210
     cv2.circle(edges,(arrmin,line),5,(0,0,0),2)
