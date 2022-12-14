@@ -27,7 +27,16 @@ Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
 - [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_loai.py)
 - [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_chung_ket.py)
 ---
+## Speed
+```
+- Vòng sơ loại
 
+```
+```
+- Vòng chung kết:
+    Tốc độ tối đa: 59
+    Tốc độ khi gặp biển báo: 45
+```
 ## Setup
 ```
 # CUDA 10.2
