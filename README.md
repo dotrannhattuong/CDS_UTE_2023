@@ -27,7 +27,16 @@ Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
 - [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_loai.py)
 - [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_chung_ket.py)
 ---
+## Speed
+```
+- Vòng sơ loại
 
+```
+```
+- Vòng chung kết:
+    Tốc độ tối đa: 59
+    Tốc độ khi gặp biển báo: 45
+```
 ## Setup
 ```
 # CUDA 10.2
@@ -42,7 +51,10 @@ pip install -r requirements.txt
 ---
 ## Download requirement files
 - [Unet](https://drive.google.com/file/d/1G91QEeZAHvvWGLhc3EIihxguBDojcn3d/view?usp=sharing)
-- [YoloV7]()
+
+<img src="notebook/images/model.png"><img src="notebook/images/out.png">
+
+- [YoloV7](https://drive.google.com/file/d/1W7X1wCmOWigCbGJMqf-7FFC0acj0knrv/view?usp=sharing)
 - [YoloV7E6]()
 
 ## MAP 2023
