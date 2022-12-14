@@ -51,7 +51,10 @@ pip install -r requirements.txt
 ---
 ## Download requirement files
 - [Unet](https://drive.google.com/file/d/1G91QEeZAHvvWGLhc3EIihxguBDojcn3d/view?usp=sharing)
-- [YoloV7]()
+
+<img src="notebook/images/model.png"><img src="notebook/images/out.png">
+
+- [YoloV7](https://drive.google.com/file/d/1W7X1wCmOWigCbGJMqf-7FFC0acj0knrv/view?usp=sharing)
 - [YoloV7E6]()
 
 ## MAP 2023
@@ -69,4 +72,3 @@ python client.py
 
 
 ## Report
-
