@@ -19,6 +19,7 @@ PORT = 54321
 # connect to the server on local computer
 s.connect(('127.0.0.1', PORT))
 
+ 
 count = 0
 count1 = 0
 
@@ -90,10 +91,13 @@ if __name__ == "__main__":
                 if count1 % frame_num == 0 and begin_get < count1 < end_get :
                     count += 1
                     cv2.imwrite(image_name, image )
-                    print("save success", "count = ", count, "cout1 = " , count1)       
+                    print("save success", "count = ", count, "cout1 = " , count1)
+                    
                 elif count1 > end_get: print ("unsave")
 
+
                 Control(sendBack_angle, sendBack_Speed)
+
 
             except Exception as er:
                 print(er)
