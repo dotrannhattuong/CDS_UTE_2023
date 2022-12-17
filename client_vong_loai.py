@@ -11,6 +11,7 @@ from torchvision import transforms
 from PIL import Image
 import argparse
 from unet import UNet
+from Controller_vongloai_Tuan import Controller
 
 # Create a socket object 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -132,7 +133,6 @@ if __name__ == "__main__":
                 # print(image_resize.shape)
 
                 """DETECT LANE"""
-                arr = []
                 mask = predict_img(net=model,
                            full_img=image_resize,
                            device=device,
@@ -142,46 +142,15 @@ if __name__ == "__main__":
                 result = mask_to_image(mask)
                 out = np.array(result)
                 img_remove = remove_small_contours(out)
-                edges = img_remove
-
-                lineRow = edges[line,:]
-                for x,y in enumerate(lineRow):
-                    if y==255:
-                        arr.append(x)
-                arrmax=max(arr)
-                arrmin=min(arr)
-                center = int((arrmax + arrmin)/2)
-                error = int(edges.shape[1]/2) - center
-                #err duong xe dang ben phai va can sang trai nen de am de nguoc lai, goc duong la dg bi sang phai
-                angle = -PID(error, 0.3, 0.00, 0.006)#0.3
-                if (angle > 0 and angle < 8):
-                    set_speed = 60
-                elif (angle > 20):
-                    set_speed = 30
-                else: set_speed = 53
-                if (float(current_speed) < 15):
-                    speed = 150
-                elif (abs(float(current_angle))>11):#11
-                    speed = 0 
-                elif (float(current_speed)>set_speed):#53
-                    speed = 0
-                else: speed = 150
-                #Control(angle, speed)
-                # print('alo', current_speed)
-                # print('alo 12', current_angle)
-                imgage = img_remove
-                # cv2.circle(imgage,(arrmin,line),5,(0,0,0),3)
-                # cv2.circle(imgage,(arrmax,line),5,(0,0,0),3)
-                # cv2.line(imgage,(center,line),(int(imgage.shape[1]/2),imgage.shape[0]),(0,0,0),3)
-                # cv2.imshow("IMG", imgage)
-                # key = cv2.waitKey(1)
+                edges = img_remove 
+                '''Controller'''
+                angle, speed = Controller(edges=edges, PID=PID, current_speed=current_speed, current_angle=current_angle)
                 end = time.time()
                 fps = 1 / (end - start)
-                print(fps)
+                # print(fps)
             except Exception as er:
                 print(er)
                 pass
     finally:
         print('closing socket')
         s.close()
-
