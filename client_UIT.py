@@ -17,7 +17,7 @@ from torchvision import transforms
 from PIL import Image
 import argparse
 from unet import UNet
-from Controller_UIT_Tuan import Controller
+from Controller_Uit import Controller
 
 
 pre_t = time.time()
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
             except Exception as er:
                 print(er)
-                speed = -25
+                speed = -45
                 pass
 
     finally:
