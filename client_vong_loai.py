@@ -3,7 +3,7 @@ import sys
 import time
 import cv2
 import numpy as np
-import json
+import json 
 import base64
 import torch
 import torch.nn.functional as F
@@ -12,6 +12,7 @@ from PIL import Image
 import argparse
 from unet import UNet
 from Controller_vongloai_Tuan import Controller
+# from Controller_Uit_45 import Controller
 
 # Create a socket object 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -21,7 +22,7 @@ port = 54321
 pre_t = time.time()
 current_speed = 0
 current_angle = 0
-# connect to the server on local computer 
+# connect to the server on local computer  
 s.connect(('127.0.0.1', port)) 
 def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images')
@@ -87,14 +88,15 @@ def remove_small_contours(image):
     mask = cv2.drawContours(image_binary, [max(contours, key=cv2.contourArea)], -1, (255, 255, 255), -1)
     image_remove = cv2.bitwise_and(image, image, mask=mask)
     return image_remove
-
+check = 50
 line = 40
-angle = 10
+angle = 0
 speed = 100
 err_arr = np.zeros(5)
 if __name__ == "__main__":
     try:
         """
+            python client.py  
             - Chương trình đưa cho bạn 3 giá trị đầu vào:
                 * image: hình ảnh trả về từ xe
                 * current_speed: vận tốc hiện tại của xe
@@ -112,7 +114,10 @@ if __name__ == "__main__":
             message = bytes(f"{angle } {speed}", "utf-8")
             s.sendall(message)
             data = s.recv(100000)
-            data_recv = json.loads(data)
+            try:
+                data_recv = json.loads(data)
+            except:
+                continue
             try:
                 current_angle = data_recv["Angle"]
                 current_speed = data_recv["Speed"]
@@ -147,9 +152,14 @@ if __name__ == "__main__":
                 angle, speed = Controller(edges=edges, PID=PID, current_speed=current_speed, current_angle=current_angle)
                 end = time.time()
                 fps = 1 / (end - start)
+                if (check==50):
+                    print('------------------+SPK_SANDBOX+-------------tt-------')
+                    check=0
+                check = check + 1
                 # print(fps)
             except Exception as er:
                 print(er)
+                speed = -45
                 pass
     finally:
         print('closing socket')
