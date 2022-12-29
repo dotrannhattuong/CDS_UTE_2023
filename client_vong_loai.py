@@ -134,7 +134,7 @@ if __name__ == "__main__":
                 imgage = cv2.imdecode(jpg_as_np, flags=1)
                 image = imgage[200:,:]
                 image_resize = cv2.resize(image, (160, 80))
-                image_resize = cv2.cvtColor(image_resize, cv2.COLOR_RGB2BGR)
+                image_resize = cv2.cvtColor(image_resize, cv2.COLOR_BGR2RGB)
                 # print(image_resize.shape)
 
                 """DETECT LANE"""
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 end = time.time()
                 fps = 1 / (end - start)
                 if (check==50):
-                    print('------------------+SPK_SANDBOX+-------------tt-------')
+                    print('------------------+SPK_SANDBOX+--------------------')
                     check=0
                 check = check + 1
                 # print(fps)
