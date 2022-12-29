@@ -8,7 +8,7 @@ def Controller(edges, PID, current_speed, current_angle):
             arr.append(x)
 
     if not arr:
-        return 0, 0
+        return 25, 0
 
     arrmax=max(arr)
     arrmin=min(arr)
