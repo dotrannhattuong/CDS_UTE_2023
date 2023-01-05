@@ -17,6 +17,7 @@ from torchvision import transforms
 from PIL import Image
 from numpy import random
 from pathlib import Path
+# from Controller_Tuan import controller
 from Controller_Tuan import controller
 #from model import build_unet
 
@@ -26,12 +27,14 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Define the port on which you want to connect
 PORT = 54321
 pre_t = time.time()# connect to the server on local computer
+pre_t_speed = time.time()
 s.connect(('127.0.0.1', PORT))
 angle = 0
 speed = 70
 line = 20
 S = 0
 err_arr = np.zeros(5)
+err_arr_speed = np.zeros(5)
 def get_args():
     parser = argparse.ArgumentParser(description='Predict masks from input images')
     parser.add_argument('--model', '-m', default='checkpoint_epoch300.pth', metavar='FILE',
@@ -76,7 +79,7 @@ model.load_state_dict(torch.load(args.model, map_location=device))
 device_od = '0'
 device_od = select_device(device_od)
 print(device_od)
-model_od = attempt_load('test.pt', map_location=device_od)  # load FP32 model
+model_od = attempt_load('best.pt', map_location=device_od)  # load FP32 model
 def detect(source, device, img_size, iou_thres, conf_thres, net):
     net.eval()
     stride = int(net.stride.max())  # model stride
@@ -115,7 +118,22 @@ def PID(err, Kp, Ki, Kd):
     D = Kd*(err - err_arr[1])/delta_t
     I = Ki*np.sum(err_arr)*delta_t
     angle = P + I + D
-    return int(angle)
+    return angle
+def PID_speed(err, Kp, Ki, Kd):
+    global pre_t_speed
+    err_arr_speed[1:] = err_arr_speed[0:-1]
+    err_arr_speed[0] = err
+    delta_t = time.time() - pre_t_speed
+    pre_t_speed = time.time()
+    P = Kp*err
+    D = Kd*(err - err_arr[1])/delta_t
+    I = Ki*np.sum(err_arr)*delta_t
+    speed = P + I + D
+    if (speed>150):
+        speed = 150
+    if (speed<0):
+        speed = -5
+    return int(speed)
 def remove_small_contours(image):
     image_binary = np.zeros((image.shape[0], image.shape[1]), np.uint8)
     contours = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
@@ -125,13 +143,16 @@ def remove_small_contours(image):
 right = 0
 left = 0
 straight = 0
+two_lane = 0
+check = 50
+check_err = 0
 if __name__ == "__main__":
     try:
         while True:
-            message_getState = bytes("0", "utf-8")
-            s.sendall(message_getState)
-            state_date = s.recv(100)
             try:
+                message_getState = bytes("0", "utf-8")
+                s.sendall(message_getState)
+                state_date = s.recv(100)
                 current_speed, current_angle = state_date.decode(
                     "utf-8"
                     ).split(' ')
@@ -149,16 +170,19 @@ if __name__ == "__main__":
                 start = time.time()
                 decoded = cv2.imdecode(np.frombuffer(data, np.uint8), -1)
                 try:
-                    img_OD = cv2.resize(decoded,(320, 160))
+                    img_OD = cv2.resize(decoded,(680, 340))
                     image_name = "img_OD.jpg"
                     cv2.imwrite(image_name, img_OD)
                 except Exception as er:
                     print(er)
+                    speed = -40
                     pass
                 try:
                     image = decoded[120:,:]
+                    # img_lane = decoded[70:,:]
+                    # img_hough, hough = lane_detech(img=img_lane, mode='hough')
                     image = cv2.resize(image, (160, 80))
-                    image_resize = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                    image_resize = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 except Exception as er:
                     print(er)
                     pass
@@ -184,17 +208,21 @@ if __name__ == "__main__":
                 img_remove = remove_small_contours(out)
                 edges = img_remove
                 """Controller"""
-                angle, speed, right, left, straight = controller(edges, PID, current_angle=current_angle, current_speed=current_speed, 
-                                          conf_OD=conf_OD, cls_OD=cls_OD, S=S, right=right, left=left, straight=straight)
+                angle, speed, right, left, straight, two_lane, check_err = controller(edges, PID, current_angle=current_angle, current_speed=current_speed, 
+                                          conf_OD=conf_OD, cls_OD=cls_OD, S=S, right=right, left=left, straight=straight, two_lane=two_lane, PID_speed=PID_speed, check_err=check_err)
                 """"""
-                cv2.imshow("IMG", edges)
-                key = cv2.waitKey(1)
+                # cv2.imshow("IMG", decoded)
+                # key = cv2.waitKey(1)
                 print(S, conf_OD, cls_OD)
                 end = time.time()
                 fps = 1 / (end - start)
-                print(fps)
+                # if (check==50):
+                #     check = 0
+                #     print('-----------------------------------------SPK_SANDBOX-----------------------------------------')
+                # check = check + 1
+                # print(fps)
             except Exception as er:
-                speed = -10
+                speed = -45
                 print(er)
                 pass
             
