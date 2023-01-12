@@ -50,6 +50,7 @@ Dataset_Lane_Segmentation/
 |----------|:-------------:|:---------:|
 |  YOLOV7  |  [Yolov7.ipynb](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/notebook/OD_yolov7.ipynb)  |  [Yolov7](https://github.com/thangnch/MiAI_YOLOv7/blob/main/YOLOv7_Miai_vn.ipynb)  |
 |  YOLOV7E6  |  [Yolov7-e6.ipynb](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/notebook/OD_yolov7e6.ipynb)  |  [Yolov7-e6](https://github.com/WongKinYiu/yolov7)  |
+|  YOLOV8  |  [Yolov8.ipynb](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/notebook/OD_yolov8.ipynb)  |  [Yolov8](https://github.com/ultralytics/ultralytics.git)  |
 |  UNET |  [Unet.ipynb](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/notebook/Lane_Segmentation.ipynb)  |  [Unet](https://github.com/milesial/Pytorch-UNet)  |
 
 ---

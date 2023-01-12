@@ -56,6 +56,7 @@ pip install -r requirements.txt
 
 - [YoloV7](https://drive.google.com/file/d/1W7X1wCmOWigCbGJMqf-7FFC0acj0knrv/view?usp=sharing)
 - [YoloV7E6]()
+- [YoloV8](https://drive.google.com/file/d/1K9DMjMO-n7P60l2gSdoe9Ecvxxs8zhzT/view?usp=sharing)
 
 ## MAP 2023
 - [Map vòng loại]()
