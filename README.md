@@ -5,8 +5,10 @@ The 2nd contest "Self-Driving Car using Image Processing and Artificial Intellig
 
 Contest format: Program the car on the simulation software and let the car pass the checkpoints.
 
-Timeline: 
+## Timeline: 
+
     30/12/2022: Vòng loại
+    14/02/2023: Vòng chung kết
 
 ## SPK Sandbox Team
 Mentor: [Đỗ Trần Nhật Tường](https://github.com/dotrannhattuong)
@@ -25,17 +27,20 @@ Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
 ## To do task 
 - [x] Labels 
 - [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_loai.py)
-- [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_chung_ket.py)
+- [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/UTE_client_chungket.py)
 ---
 ## Speed
 ```
-- Vòng sơ loại
+- Vòng sơ loại:
+    Tốc độ tối đa: 65
 
 ```
 ```
-- Vòng chung kết:
-    Tốc độ tối đa: 59
-    Tốc độ khi gặp biển báo: 45
+- Vòng chung kết UTE:
+    Tốc độ tối đa: 72
+    Tốc độ khi gặp biển báo: 69
+    Tốc độ khi gặp vật cản: 70
+    Model: YoloV7, UNET
 ```
 ## Setup
 ```
@@ -54,13 +59,13 @@ pip install -r requirements.txt
 
 <img src="notebook/images/model.png"><img src="notebook/images/out.png">
 
-- [YoloV7](https://drive.google.com/file/d/1W7X1wCmOWigCbGJMqf-7FFC0acj0knrv/view?usp=sharing)
+- [YoloV7](https://drive.google.com/file/d/1o1CSS_BuofBFidCzMbMRg5CLdZ7Hwdmh/view?usp=sharing)
 - [YoloV7E6]()
 - [YoloV8](https://drive.google.com/file/d/1K9DMjMO-n7P60l2gSdoe9Ecvxxs8zhzT/view?usp=sharing)
 
 ## MAP 2023
-- [Map vòng loại]()
-- [Map vòng chung kết]()
+- [Map vòng loại](https://drive.google.com/drive/folders/1Ml0AbdFrBeP5l68zCzwIkUqS3WqkgGl7?usp=sharing)
+- [Map vòng chung kết (demo)](https://drive.google.com/drive/folders/1ZcfpKk4Pw33Z3NCO2BVZk4efuu-Phrbd?usp=sharing)
 ## Training
 
 
