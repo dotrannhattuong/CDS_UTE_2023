@@ -55,13 +55,13 @@ pip install -r requirements.txt
 
 ---
 ## Download requirement files
-- [Unet](https://drive.google.com/file/d/1G91QEeZAHvvWGLhc3EIihxguBDojcn3d/view?usp=sharing)
+- [Unet](https://drive.google.com/file/d/1b6Ew_R8gJywSL6chGk_4I9lFL7yrdZsH/view?usp=sharing)
 
 <img src="notebook/images/model.png"><img src="notebook/images/out.png">
 
-- [YoloV7](https://drive.google.com/file/d/1o1CSS_BuofBFidCzMbMRg5CLdZ7Hwdmh/view?usp=sharing)
+- [YoloV7](https://drive.google.com/file/d/1ZfsixmYRqYa9qYFaKERfqGS5y8rE8K4S/view?usp=sharing)
 - [YoloV7E6]()
-- [YoloV8](https://drive.google.com/file/d/1K9DMjMO-n7P60l2gSdoe9Ecvxxs8zhzT/view?usp=sharing)
+- [YoloV8](https://drive.google.com/file/d/1GbMtBivUqZnhPquq-a36-9WMytVIVgM-/view?usp=sharing)
 
 ## MAP 2023
 - [Map vòng loại](https://drive.google.com/drive/folders/1Ml0AbdFrBeP5l68zCzwIkUqS3WqkgGl7?usp=sharing)
