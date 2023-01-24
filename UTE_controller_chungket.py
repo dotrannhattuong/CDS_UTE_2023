@@ -21,7 +21,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     """"""
     """detect trai"""
     leftarr = []
-    lineLeft = edges[:,9]
+    lineLeft = edges[:,13]
     for x,y in enumerate(lineLeft):
         if y==255:
             leftarr.append(x)
@@ -37,7 +37,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     """"""
     """detect phai"""
     rightarr = []
-    lineRight = edges[:,150]
+    lineRight = edges[:,147]
     for x,y in enumerate(lineRight):
         if y==255:
             rightarr.append(x)
@@ -96,9 +96,9 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         if (cls==6 and S>7000):
             print('---------------------------------------------------------------', float(current_speed))
             if (od<320):
-                arrmin = 72
+                arrmin = 70
             else: 
-                arrmax = 88
+                arrmax = 90
 
     # if (check_err==1):
     #     t = time.time()
@@ -127,14 +127,16 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     error = int(edges.shape[1]/2) - center
     # print(error)
     angle = -PID(error, 0.35, 0.000, 0.065)#0.3
-    if (angle>14 and left==0 and right==0 and conf==0 and float(current_speed)>60):
+    if (angle>13 and left==0 and right==0 and conf==0 and float(current_speed)>60):
         angle=25
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ +25')
-    if(angle<-14 and left==0 and right==0 and conf==0 and float(current_speed)>60):
+    if(angle<-13 and left==0 and right==0 and conf==0 and float(current_speed)>60):
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -25')
         angle=-25
     if (cls==6 and S>2500 and conf>0.8):
         set_speed_OD = 70
+    elif (cls==2 and S>2500 and conf>0.8):
+        set_speed_OD = 75
     elif (conf>0.6 and cls!=7 and S>2800):
         set_speed_OD=69
     elif (right==1 or left==1):
@@ -188,21 +190,37 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     """TIME DELAY STRAIGHT"""
     if (straight==2):
         straight=0
-        print('speed:.....................................................straight.................', float(current_speed))  
+        print('speed:.....................................................straight.................', float(current_speed), arrmax, arrmin)  
         t3 = time.time()
-        while ((time.time()-t3)<0.8):
+        while ((time.time()-t3)<1):
             None
     ############################################################################################################################################
     """STRAIGHT"""
-    if (conf > 0.8 and S>2800): # can sua lai
+    if (conf > 0.8 and S>2900): # can sua lai
         if (cls==2):
             straight=1
-    if (straight==1 and S>4000):
+    if (straight==1 and S>5000):
         angle = 0
         speed = 150
         straight=2
+    # if (straight==1):
+    #     if (left_detect==0 and right_detect==1):
+    #         center = arrmin + 59
+    #         error = int(edges.shape[1]/2) - center
+    #         angle = -PID(error, 0.35, 0.000, 0.065)#0.3
+    #         if (left_detect==0 or right_detect==0):
+    #             straight=0
+    #         return angle, 150, check_err, right, left, straight, notleft, notright
+    #     elif (left_detect==1 and right_detect==0):
+    #         center = arrmax - 59
+    #         error = int(edges.shape[1]/2) - center
+    #         angle = -PID(error, 0.35, 0.000, 0.065)#0.3
+    #         print('99999999999999999999999999999999999999999999999999999999999999999999999999999999')
+    #         if (left_detect==0 or right_detect==0):
+    #             straight=0
+    #         return angle, 150, check_err, right, left, straight, notleft, notright
     """TURN RIGHT"""
-    if (conf > 0.8 and S>2800): # can sua lai
+    if (conf > 0.8 and S>2900): # can sua lai
         if (cls==1):
             right=1
     if (right==1):  
@@ -211,6 +229,9 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
             speed = 150
             right = 2
             notleft=0
+        else: 
+            if (left_detect==1):
+                angle = 0.04
         # elif (left_detect==0 and arrmax>150):
         #     print('left________________________________________________________________________________________________detect')
         #     arrmin=5
@@ -218,7 +239,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         #     error = int(edges.shape[1]/2) - center
         #     angle = -PID(error, 0.35, 0.000, 0.065)#0.3
     """TURN LEFT"""
-    if (conf > 0.8 and S>2800): # can sua lai
+    if (conf > 0.8 and S>2900): # can sua lai
         if (cls==8):
             left=1
     if (left==1): 
@@ -227,6 +248,9 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
             speed = 150
             left = 2 
             notright=0
+        else: 
+            if (right_detect==1):
+                angle = -0.04
         # elif (right_detect==0 and arrmin<10):
         #     print('right_________________________________________________________________________________________________detect')
         #     arrmax=155
@@ -234,7 +258,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         #     error = int(edges.shape[1]/2) - center
         #     angle = -PID(error, 0.35, 0.000, 0.065)#0.3
     """NO TURN RIGHT"""
-    if (conf > 0.8 and S>2800): # can sua lai
+    if (conf > 0.8 and S>2900): # can sua lai
         if (cls==4):
             notright=1
     if (notright==1):
@@ -243,7 +267,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         elif (straight_detect==1):
             straight=1
     """NO TURN LEFT"""
-    if (conf > 0.8 and S>2800): # can sua lai
+    if (conf > 0.8 and S>2900): # can sua lai
         if (cls==3):
             notleft=1
     if (notleft==1):
@@ -258,18 +282,19 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
                 set_speed =  set_speed_OD
             if (set_speed>0 and float(current_speed)>set_speed):
                 er = float(current_speed) - set_speed 
-                speed = -er
+                speed = -er*1.15
             else: speed = 150
         else:
-            if (abs(angle)<2):
+            if (abs(angle)<3):
                 set_speed=75
-            else: set_speed = 68 - abs(error)/6
+            else: set_speed = 70 - abs(error)/6
             if (float(current_speed)<set_speed):
                 speed=150
             else: 
                 if (float(current_speed)>72):
                     speed = 0
-                else: speed = -2.3*abs((error)) + 150
+                else: speed = -2.2*abs((error)) + 150
+    print(arrmax, arrmin, left_detect, right_detect)
     # cv2.circle(edges,(arrmin,line),5,(0,0,0),3)
     # cv2.circle(edges,(arrmax,line),5,(0,0,0),3)
     # # cv2.circle(edges,(arrmin_turn,line_turn),5,(0,0,0),3)

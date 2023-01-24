@@ -19,10 +19,11 @@ from utils.plots import plot_one_box
 from utils.general import check_img_size, non_max_suppression, \
     scale_coords, set_logging
 from numpy import random
-from UTE_controller_chungket import Controller
+from controller_v8 import Controller
 from utils_segment.data_loading import BasicDataset
 # from Controller_Uit_45 import Controller
 import logging
+from ultralytics import YOLO
 # Create a socket object 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 # from ultralytics import YOLO
@@ -101,38 +102,9 @@ logging.info('Model loaded!')
 sendBack_angle = 0
 sendBack_speed = 0
 """OD"""
-device_od = '0'
-device_od = select_device(device_od)
-print(device_od)
-model_od = attempt_load('bestnew.pt', map_location=device_od)  # load FP32 model
-def detect(source, device, img_size, iou_thres, conf_thres, net):
-    net.eval()
-    stride = int(net.stride.max())  # model stride
-    imgsz = check_img_size(img_size, s=stride)  # check img_size
-    dataset = LoadImages(source, img_size=imgsz, stride=stride)
-    names = net.module.names if hasattr(net, 'module') else net.names
-    colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
-    for path, img, im0s, vid_cap in dataset:
-        img = torch.from_numpy(img).to(device)
-        img = img.float()
-        img /= 255.0  # 0 - 255 to 0.0 - 1.0
-        if img.ndimension() == 3:
-            img = img.unsqueeze(0)
-        with torch.no_grad():
-            pred = net(img)[0]
-        pred = non_max_suppression(pred, conf_thres, iou_thres)
-        for i, det in enumerate(pred):  # detections per image
-            p, s, im0 = path, '', im0s
-            if len(det):
-                # Rescale boxes from img_size to im0 size
-                det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
-                for *xyxy, conf, cls in reversed(det):
-                    label = f'{names[int(cls)]} {conf:.2f}'
-                    #lay gia tri cua OD
-                    label_OD = f'{names[int(cls)]}' 
-                    # plot_one_box(xyxy, im0, label=label, color=colors[int(cls)], line_thickness=1)
-                return float(xyxy[0]), float(xyxy[1]), float(xyxy[2]), float(xyxy[3]), float(conf), float(cls)
-            else: return 0, 0, 0, 0, 0, 0
+model_OD = YOLO("best_v8_new.pt")
+device = 'cuda'
+model_OD.to(device)
 def Control(angle, speed):
     global sendBack_angle, sendBack_speed
     sendBack_angle = angle
@@ -205,13 +177,9 @@ if __name__ == "__main__":
                 jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
                 imgage = cv2.imdecode(jpg_as_np, flags=1)
                 img_OD = imgage
-                # print(img_OD.shape)
                 image_name = "img_OD.jpg"
                 cv2.imwrite(image_name, img_OD)
                 image = imgage[200:,:]
-                # image = cv2.imread('anh.jpg')
-                # image = image[110:,:]
-                # cv2.imwrite('check.jpg', image)
                 image_resize = cv2.resize(image, (160, 80))
                 image_resize = cv2.cvtColor(image_resize, cv2.COLOR_BGR2RGB)
                 img = Image.fromarray(image_resize)
@@ -227,12 +195,24 @@ if __name__ == "__main__":
                     7: unknown
                     8: turn left"""
                 torch.cuda.is_available()
-                with torch.no_grad():
-                    xmin, ymin, xmax, ymax, conf_OD, cls_OD = detect('img_OD.jpg', device, img_size=320, iou_thres=0.25, conf_thres=0.25, net=model_od)
+                # with torch.no_grad():
+                #     xmin, ymin, xmax, ymax, conf_OD, cls_OD = detect('img_OD.jpg', device, img_size=320, iou_thres=0.25, conf_thres=0.25, net=model_od)
                 try:
+                    results = model_OD.predict(source="img_OD.jpg")
+                    for result in results:
+                    # detection
+                        result = result.to("cpu")
+                        result = result.numpy()
+                        xmin, ymin, xmax, ymax = result.boxes.xyxy[0,0], result.boxes.xyxy[0,1], result.boxes.xyxy[0,2], result.boxes.xyxy[0,3]   # box with xyxy format, (N, 4)
+                        conf_OD = result.boxes.conf[0]   # confidence score, (N, 1)
+                        cls_OD = result.boxes.cls[0]    # cls, (N, 1)
                     S_OD = (xmax - xmin)*(ymax - ymin)  # S>1000, nga ba arrmax = 160
                 except Exception as er:
-                    print(er)
+                    xmax=0
+                    xmin=0
+                    cls_OD=0
+                    conf_OD=0
+                    S_OD=0
                     pass
                 """DETECT LANE"""
                 # mask = predict_img(net=net,
@@ -254,7 +234,6 @@ if __name__ == "__main__":
                 # img_cv = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
                 img_remove = remove_small_contours(out)
                 edges = img_remove
-                # cv2.imwrite('check2.jpg', edges)
                 '''Controller'''
                 angle, speed, check_err, right, left, straight, no_turn_left, no_turn_right = Controller(edges=edges, PID=PID, current_speed=current_speed, current_angle=current_angle, 
                                                      check_err=check_err, xmax=xmax, xmin=xmin, conf=conf_OD, cls=cls_OD, right=right,
@@ -266,8 +245,7 @@ if __name__ == "__main__":
                 #     check=0
                 # check = check + 1
                 print(S_OD, conf_OD, cls_OD)
-                # print(fps)
-                # cv2.imshow("IMG1", image)
+                print(fps)
                 # cv2.imshow("IMG", edges)
                 # key = cv2.waitKey(1)
             except Exception as er:
