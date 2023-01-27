@@ -19,7 +19,7 @@ from utils.plots import plot_one_box
 from utils.general import check_img_size, non_max_suppression, \
     scale_coords, set_logging
 from numpy import random
-from controller_v8 import Controller
+from UTE_controller_chungket import Controller
 from utils_segment.data_loading import BasicDataset
 # from Controller_Uit_45 import Controller
 import logging
