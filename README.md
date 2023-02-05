@@ -27,21 +27,33 @@ Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
 ## To do task 
 - [x] Labels 
 - [x] [Vòng sơ loại](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/client_vong_loai.py)
-- [ ] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/UTE_client_chungket.py)
+- [x] [Vòng chung kết](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/UTE_client_chungket.py)
 ---
 ## Speed
+<img src="image/khuccua.png">
+
+---
 ```
 - Vòng sơ loại:
-    Tốc độ tối đa: 65
-
+    + Tốc độ tối đa: 65
+    + Code: 2 khúc cua gấp liền nhau -> Dùng timer khi cua gấp để tránh cua sớm ở khúc cua kế 
 ```
+- [Kết quả vòng sơ loại](https://www.youtube.com/watch?v=r5NXqryFd5U)
 ```
 - Vòng chung kết UTE:
-    Tốc độ tối đa: 72
-    Tốc độ khi gặp biển báo: 69
-    Tốc độ khi gặp vật cản: 70
-    Model: YoloV7, UNET
+    + Tốc độ tối đa: 75
+    + Tốc độ khi gặp biển báo: 71.5
+    + Tốc độ khi gặp vật cản: 75
+    + Model: YoloV8, UNET
+    + Code: 
+       Khúc cua: Timer với thời gian delay phục thuộc vào tốc độ để đi thẳng -> Cua góc 25 với timer 1.1s
+       Đi thẳng: Timer với góc lái bằng 0
+       Thời điểm cua: Max > 152 or Min < 8
+       Điều khiển tốc độ: Dùng hàm Linear
+       Lên dốc: Hạ line, góc bù thêm 1
+       Cua gấp, xuống dốc: Tốc độ lớn hơn 62, angle>11 -> angle=25
 ```
+- [Kết quả vòng chung kết (demo)](https://www.youtube.com/watch?v=bjkq4dZFzao)
 ## Setup
 ```
 # CUDA 10.2
@@ -73,8 +85,13 @@ pip install -r requirements.txt
 ```
 python client.py
 ```
+## Reference 
+- Object Detection: https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/docs/Object%20Detection.pptx.pdf
+- Code: https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/docs/UIT-CAR-RACING-2021.pdf
+## Survey
+<img src="image/survey.png">
 
 ## Build and run docker
 
-
 ## Report
+- [Final Round](https://github.com/dotrannhattuong/CDS_UTE_2023/blob/main/docs/Cu%E1%BB%99c-thi-%C4%91ua-xe-t%E1%BB%B1-h%C3%A0nh.pptx)
