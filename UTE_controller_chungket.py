@@ -70,10 +70,10 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         center = int((arrmax + arrmin)/2)  
         error = int(edges.shape[1]/2) - center
         angle_check = -PID(error, 0.35, 0.000, 0.065)#0.3
-        # if (float(current_angle)>0):
-        #     angle_check = float(current_angle)+2
-        # if (float(current_angle)<0):
-        #     angle_check = float(current_angle)-2
+        if (angle_check>0):
+            angle_check = angle_check + 1
+        if (angle_check<0):
+            angle_check = angle_check - 1
         # if (right>1):
         #     angle_check = 25
         #     print('angle==========================25')
@@ -96,9 +96,9 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         if (cls==6 and S>6500):
             print('---------------------------------------------------------------', float(current_speed))
             if (od<320):
-                arrmin = 68
+                arrmin = 60
             else: 
-                arrmax = 92
+                arrmax = 100
 
     # if (check_err==1):
     #     t = time.time()
@@ -127,20 +127,20 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     error = int(edges.shape[1]/2) - center
     # print(error)
     angle = -PID(error, 0.35, 0.000, 0.065)#0.3
-    if (angle>13 and left==0 and right==0 and conf==0 and float(current_speed)>62):
+    if (angle>11 and left==0 and right==0 and conf==0 and float(current_speed)>62):
         angle=25
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ +25')
-    if(angle<-13 and left==0 and right==0 and conf==0 and float(current_speed)>62):
+    if(angle<-11 and left==0 and right==0 and conf==0 and float(current_speed)>62):
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -25')
         angle=-25
     if (cls==6 and S>2500 and conf>0.8):
-        set_speed_OD = 70
-    elif (cls==2 and S>2500 and conf>0.8):
         set_speed_OD = 75
+    elif (cls==2 and S>2500 and conf>0.8):
+        set_speed_OD = 77
     elif (conf>0.6 and cls!=7 and S>2800):
-        set_speed_OD=69
+        set_speed_OD=71.5
     elif (right==1 or left==1):
-        set_speed_OD = 69
+        set_speed_OD = 71.5
     # elif (notleft==1 or notright==1):
     #     set_speed_OD=70
     else: set_speed_OD=0
@@ -161,8 +161,18 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         # if(float(current_speed)<65):
         #     tdelay_right=0.368-0.005*(float(current_speed)) 
         tdelay_right=0.36-0.005*(float(current_speed)) + 0.0007*(70-int(current_speed))*(70-float(current_speed))
-        if (float(current_speed)<66):
+        if (float(current_speed)>69.5):
+            tdelay_right = tdelay_right-0.005
+        if (float(current_speed)<69.5 and float(current_speed)>66):
+            tdelay_right = tdelay_right+0.002
+        if (float(current_speed)<66 and float(current_speed)>59.5):
             tdelay_right = tdelay_right+0.009
+        if (float(current_speed)<59.5 and float(current_speed)>50):
+            tdelay_right = tdelay_right-0.015
+        if (float(current_speed)<50 and float(current_speed)>40):
+            tdelay_right = tdelay_right-0.025
+        if (float(current_speed)<40):
+            tdelay_right = tdelay_right-0.035
         while ((time.time()-t1)<tdelay_right):
             None
         angle = 25
@@ -185,8 +195,18 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         #     tdelay_left=0.368-0.005*(float(current_speed))
         # else: tdelay_left=0.36-0.005*(float(current_speed))
         tdelay_left=0.36-0.005*(float(current_speed)) + 0.0007*(70-int(current_speed))*(70-int(current_speed))
-        if (float(current_speed)<66):
+        if (float(current_speed)>69.5):
+            tdelay_left = tdelay_left-0.005
+        if (float(current_speed)<69.5 and float(current_speed)>66):
+            tdelay_left = tdelay_left+0.002
+        if (float(current_speed)<66 and float(current_speed)>59.5):
             tdelay_left = tdelay_left+0.009
+        if (float(current_speed)<59.5 and float(current_speed)>50):
+            tdelay_left = tdelay_left-0.015
+        if (float(current_speed)<50 and float(current_speed)>40):
+            tdelay_left = tdelay_left-0.025
+        if (float(current_speed)<40):
+            tdelay_left = tdelay_left-0.035
         while ((time.time()-t2)<tdelay_left):
             None
         angle = -25
@@ -232,7 +252,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         else: 
             if (left_detect==1):
                 if(notleft==1):
-                    angle = 0.05
+                    angle = 0.055
                     print('                                                      ')
                     print('                                 righttttttttttttttttttttttttttttttttttttttttttttttt')
                     print('                                                      ')
@@ -253,7 +273,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
                     print('                                                      ')
                     print('                                 leftttttttttttttttttttttttttttttttttttttttttttttttttttt')
                     print('                                                      ')
-                    angle = -0.05
+                    angle = -0.055
                 else: angle = -0.03
     """NO TURN RIGHT"""
     if (conf > 0.8 and S>2900): # can sua lai
@@ -280,18 +300,20 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
                 set_speed =  set_speed_OD
             if (set_speed>0 and float(current_speed)>set_speed):
                 er = float(current_speed) - set_speed 
-                speed = -er*1.15
+                speed = -er*0.8 + 5
+                if (cls==6 and S>2000):
+                    speed = 10
             else: speed = 150
         else:
-            if (abs(angle)<2.5):
+            if (abs(angle)<4):
                 set_speed=75
-            else: set_speed = 70 - abs(error)/6
+            else: set_speed = 73 - abs(error)/6
             if (float(current_speed)<set_speed):
                 speed=150
             else: 
-                if (float(current_speed)>72):
+                if (float(current_speed)>75):
                     speed = 0
-                else: speed = -2.2*abs((error)) + 150
+                else: speed = -2.1*abs((error)) + 150
     print(arrmax, arrmin, left_detect, right_detect)
     # cv2.circle(edges,(arrmin,line),5,(0,0,0),3)
     # cv2.circle(edges,(arrmax,line),5,(0,0,0),3)
