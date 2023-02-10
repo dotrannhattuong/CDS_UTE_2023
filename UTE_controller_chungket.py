@@ -1,9 +1,10 @@
 import cv2
 import time
-def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, conf, cls, right, left, straight, S, notleft, notright):
+def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, conf, cls, right, left, straight, S, notleft, notright, lefttest, righttest):
     angle_check=0
     rightmin=0
     leftmin=0
+    cuagap=0
     od = (xmax + xmin)/2
     """detect duong thang"""
     straightarr = []
@@ -77,7 +78,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         # if (right>1):
         #     angle_check = 25
         #     print('angle==========================25')
-        return angle_check, 100, check_err, right, left, straight, notleft, notright
+        return angle_check, 100, check_err, right, left, straight, notleft, notright, lefttest, righttest
     arrmax=max(arr)
     arrmin=min(arr)
     arrmax_turn=max(arr)
@@ -129,32 +130,36 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     angle = -PID(error, 0.35, 0.000, 0.065)#0.3
     if (angle>11 and left==0 and right==0 and conf==0 and float(current_speed)>62):
         angle=25
+        cuagap=1
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ +25')
     if(angle<-11 and left==0 and right==0 and conf==0 and float(current_speed)>62):
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -25')
         angle=-25
+        cuagap=1
     if (cls==6 and S>2500 and conf>0.8):
-        set_speed_OD = 75
+        set_speed_OD = 77
     elif (cls==2 and S>2500 and conf>0.8):
         set_speed_OD = 77
-    elif (conf>0.6 and cls!=7 and S>2800):
-        set_speed_OD=71.5
-    elif (right==1 or left==1):
-        set_speed_OD = 71.5
+    if (conf>0.6 and cls!=7 and S>2800):
+        set_speed_OD=77
+    if (right==1 or left==1):
+        set_speed_OD = 75
+    if (righttest==1 or lefttest==1):
+        set_speed_OD = 75
     # elif (notleft==1 or notright==1):
     #     set_speed_OD=70
     else: set_speed_OD=0
     """TIME DELAY TURN RIGHT"""
     # CUA 0.7S
     if (right==3):
-        print('speed:......................................................................', float(current_speed))  
+        print('speed:.......................................RIGHT...............................', float(current_speed))  
         right=0
         t1 = time.time()
         while ((time.time()-t1)<1.1):
             None
     # DI THANG 0.1s
     if (right==2):
-        print('speed:......................................................................', float(current_speed))  
+        print('speed:........................................STRAIGHT RIGHT..............................', float(current_speed))  
         right=3
         t1 = time.time()
         # tdelay_right=0.01
@@ -162,9 +167,9 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         #     tdelay_right=0.368-0.005*(float(current_speed)) 
         tdelay_right=0.36-0.005*(float(current_speed)) + 0.0007*(70-int(current_speed))*(70-float(current_speed))
         if (float(current_speed)>69.5):
-            tdelay_right = tdelay_right-0.005
+            tdelay_right = tdelay_right-0.0055
         if (float(current_speed)<69.5 and float(current_speed)>66):
-            tdelay_right = tdelay_right+0.002
+            tdelay_right = tdelay_right+0.0025
         if (float(current_speed)<66 and float(current_speed)>59.5):
             tdelay_right = tdelay_right+0.009
         if (float(current_speed)<59.5 and float(current_speed)>50):
@@ -173,21 +178,30 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
             tdelay_right = tdelay_right-0.025
         if (float(current_speed)<40):
             tdelay_right = tdelay_right-0.035
+        if (righttest==1 and float(current_speed)>70):
+            tdelay_right = 0
+            print('                                                      ')
+            print('da tru delayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
+            print('                                                      ')
         while ((time.time()-t1)<tdelay_right):
             None
         angle = 25
         speed = 140
+        if (righttest==1 and float(current_speed)>70):
+            angle = 25
+            speed = 140
+        righttest = 0
     """TIME DELAY TURN LEFT"""
     # CUA 0.7S
     if (left==3):
-        print('speed:..................................................left....................', float(current_speed))  
+        print('speed:..................................................LEFT....................', float(current_speed))  
         left=0
         t2 = time.time()
         while ((time.time()-t2)<1.2):
             None
     # DI THANG 0.1s
     if (left==2):
-        print('speed:.....................................................left.................', float(current_speed))  
+        print('speed:.....................................................STRAIGHT LEFT.................', float(current_speed))  
         left=3
         t2 = time.time()
         # tdelay_left=0.01
@@ -197,20 +211,29 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         tdelay_left=0.36-0.005*(float(current_speed)) + 0.0007*(70-int(current_speed))*(70-int(current_speed))
         if (float(current_speed)>69.5):
             tdelay_left = tdelay_left-0.005
-        if (float(current_speed)<69.5 and float(current_speed)>66):
-            tdelay_left = tdelay_left+0.002
-        if (float(current_speed)<66 and float(current_speed)>59.5):
+        elif (float(current_speed)<69.5 and float(current_speed)>66):
+            tdelay_left = tdelay_left+0.0025
+        elif (float(current_speed)<66 and float(current_speed)>59.5):
             tdelay_left = tdelay_left+0.009
-        if (float(current_speed)<59.5 and float(current_speed)>50):
+        elif (float(current_speed)<59.5 and float(current_speed)>50):
             tdelay_left = tdelay_left-0.015
-        if (float(current_speed)<50 and float(current_speed)>40):
+        elif (float(current_speed)<50 and float(current_speed)>40):
             tdelay_left = tdelay_left-0.025
-        if (float(current_speed)<40):
+        elif (float(current_speed)<40):
             tdelay_left = tdelay_left-0.035
+        if (lefttest==1 and float(current_speed)>70):
+            tdelay_left = 0
+            print('                                                      ')
+            print('da tru delayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
+            print('                                                      ')
         while ((time.time()-t2)<tdelay_left):
             None
         angle = -25
         speed = 140
+        if (lefttest==1 and float(current_speed)>70):
+            angle = -25
+            speed = 140
+        lefttest = 0
     """TIME DELAY STRAIGHT"""
     if (straight==2):
         print('speed:.....................................................straight.................', float(current_speed), arrmax, arrmin)  
@@ -227,6 +250,8 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         angle = 0
         speed = 150
         straight=2
+        notleft=0
+        notright=0
     # if (straight==1):
     #     if (left_detect==0 and right_detect==1):
     #         if (arrmax>145):
@@ -244,11 +269,25 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         if (cls==1):
             right=1
     if (right==1):  
+        # line = 41
+        # arr = []
+        # lineRow = edges[line,:]
+        # for x,y in enumerate(lineRow):
+        #     if y==255:
+        #         arr.append(x)
+        # arrmax_turn=max(arr)
+        # arrmin_turn=min(arr)
         if (arrmax_turn>152):
-            angle = 0
-            speed = 150
-            right = 2
-            notleft=0
+            if(float(current_speed)>71):
+                angle = 25
+                speed = 150
+                right = 3
+                notleft=0
+            else: 
+                angle = 0
+                speed = 150
+                right = 2
+                notleft=0
         else: 
             if (left_detect==1):
                 if(notleft==1):
@@ -262,11 +301,25 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
         if (cls==8):
             left=1
     if (left==1): 
+        # line = 41
+        # arr = []
+        # lineRow = edges[line,:]
+        # for x,y in enumerate(lineRow):
+        #     if y==255:
+        #         arr.append(x)
+        # arrmax_turn=max(arr)
+        # arrmin_turn=min(arr)
         if (arrmin_turn<8):
-            angle = 0
-            speed = 150
-            left = 2 
-            notright=0
+            if(float(current_speed)>71):
+                angle = -25
+                speed = 150
+                left = 3
+                notright=0
+            else:
+                angle = 0
+                speed = 150
+                left = 2
+                notright=0
         else: 
             if (right_detect==1):
                 if (notright==1):
@@ -282,6 +335,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     if (notright==1):
         if (left_detect==1):
             left=1
+            lefttest = 1
         elif (straight_detect==1):
             straight=1
     """NO TURN LEFT"""
@@ -291,6 +345,7 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     if (notleft==1):
         if (right_detect==1):
             right=1
+            righttest = 1
         elif (straight_detect==1):
             straight=1
     #err duong xe dang ben phai va can sang trai nen de am de nguoc lai, goc duong la dg bi sang phai
@@ -300,20 +355,39 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
                 set_speed =  set_speed_OD
             if (set_speed>0 and float(current_speed)>set_speed):
                 er = float(current_speed) - set_speed 
-                speed = -er*0.8 + 5
+                if (float(current_speed)>75):
+                    speed = -2
+                # speed = -er*0.8 + 5
+                else: speed = 0
                 if (cls==6 and S>2000):
                     speed = 10
-            else: speed = 150
+            else: 
+                if(abs(float(current_speed) - set_speed)<4):
+                    speed = 130
+                else: speed = 150
         else:
-            if (abs(angle)<4):
-                set_speed=75
-            else: set_speed = 73 - abs(error)/6
+            if (abs(angle)<3):
+                set_speed=80
+            else: set_speed = 77 - abs(error)/6
             if (float(current_speed)<set_speed):
                 speed=150
             else: 
-                if (float(current_speed)>75):
+                if (float(current_speed)>81):
                     speed = 0
-                else: speed = -2.1*abs((error)) + 150
+                else: 
+                    if (cuagap==1):
+                        speed = -2.2*abs((error)) + 150
+                    elif (righttest==1 or lefttest==1):
+                        speed = -2.1*abs((error)) + 150
+                    elif (float(current_speed)>70):
+                        if (cls>0 and S>2800):
+                            speed = -1.7*abs((error)) + 150
+                        else: speed = -1.5*abs((error)) + 150
+                    elif (float(current_speed)>65):
+                        speed = -1.4*abs((error)) + 150
+                    elif (float(current_speed)<60):
+                        speed = 150
+                    else: speed = -1.2*abs((error)) + 150
     print(arrmax, arrmin, left_detect, right_detect)
     # cv2.circle(edges,(arrmin,line),5,(0,0,0),3)
     # cv2.circle(edges,(arrmax,line),5,(0,0,0),3)
@@ -322,6 +396,6 @@ def Controller(edges, PID, current_speed, current_angle, check_err, xmax, xmin, 
     # # cv2.line(edges,(center,line),(int(edges.shape[1]/2),edges.shape[0]),(0,0,0),3)
     # cv2.imshow("IMG", edges)
     # key = cv2.waitKey(1)
-    return angle, speed, check_err, right, left, straight, notleft, notright
+    return angle, speed, check_err, right, left, straight, notleft, notright, lefttest, righttest
     
     

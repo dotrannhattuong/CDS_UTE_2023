@@ -20,6 +20,8 @@ from utils.general import check_img_size, non_max_suppression, \
     scale_coords, set_logging
 from numpy import random
 from UTE_controller_chungket import Controller
+# from duphong2_v8_v80 import Controller
+# from duphong_v8_v80 import Controller
 from utils_segment.data_loading import BasicDataset
 # from Controller_Uit_45 import Controller
 import logging
@@ -136,6 +138,8 @@ left=0
 straight=0
 no_turn_left=0
 no_turn_right=0
+lefttest = 0
+righttest = 0
 err_arr = np.zeros(5)
 if __name__ == "__main__":
     try:
@@ -182,6 +186,9 @@ if __name__ == "__main__":
                 image = imgage[200:,:]
                 image_resize = cv2.resize(image, (160, 80))
                 image_resize = cv2.cvtColor(image_resize, cv2.COLOR_BGR2RGB)
+                # image_test = cv2.cvtColor(cv2.imread('img_OD_trai.jpg'), cv2.COLOR_RGB2BGR)
+                # image_test = cv2.cvtColor(imgage, cv2.COLOR_BGR2RGB)
+                # cv2.imwrite('slide2kk.jpg', image_test)
                 img = Image.fromarray(image_resize)
                 # print(image_resize.shape)
                 """DETECT OD YOLOV7"""
@@ -234,10 +241,11 @@ if __name__ == "__main__":
                 # img_cv = cv2.cvtColor(out, cv2.COLOR_RGB2BGR)
                 img_remove = remove_small_contours(out)
                 edges = img_remove
+                # cv2.imwrite('imgslide1.jpg', img_remove)
                 '''Controller'''
-                angle, speed, check_err, right, left, straight, no_turn_left, no_turn_right = Controller(edges=edges, PID=PID, current_speed=current_speed, current_angle=current_angle, 
+                angle, speed, check_err, right, left, straight, no_turn_left, no_turn_right, lefttest, righttest = Controller(edges=edges, PID=PID, current_speed=current_speed, current_angle=current_angle, 
                                                      check_err=check_err, xmax=xmax, xmin=xmin, conf=conf_OD, cls=cls_OD, right=right,
-                                                      left=left, straight=straight, S=S_OD, notleft=no_turn_left, notright=no_turn_right)
+                                                      left=left, straight=straight, S=S_OD, notleft=no_turn_left, notright=no_turn_right, lefttest=lefttest, righttest=righttest)
                 end = time.time()
                 fps = 1 / (end - start)
                 # if (check==50):
@@ -246,8 +254,9 @@ if __name__ == "__main__":
                 # check = check + 1
                 print(S_OD, conf_OD, cls_OD)
                 print(fps)
+                # cv2.imshow("IMG", image_test)
                 # cv2.imshow("IMG", edges)
-                # key = cv2.waitKey(1)
+                key = cv2.waitKey(1)
             except Exception as er:
                 print(er)
                 speed = -45
