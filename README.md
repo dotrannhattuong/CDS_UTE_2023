@@ -41,9 +41,9 @@ Leader: [Trần Văn Hồ ](https://github.com/tranvanhospk)
 - [Kết quả vòng sơ loại](https://www.youtube.com/watch?v=r5NXqryFd5U)
 ```
 - Vòng chung kết UTE:
-    + Tốc độ tối đa: 75
-    + Tốc độ khi gặp biển báo: 71.5
-    + Tốc độ khi gặp vật cản: 75
+    + Tốc độ tối đa: 80
+    + Tốc độ khi gặp biển báo: 75
+    + Tốc độ khi gặp vật cản: 77
     + Model: YoloV8, UNET
     + Code: 
        Khúc cua: Timer với thời gian delay phục thuộc vào tốc độ để đi thẳng -> Cua góc 25 với timer 1.1s
