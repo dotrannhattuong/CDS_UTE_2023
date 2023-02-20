@@ -64,7 +64,10 @@ pip install -r requirements.txt
 ---
 ## Methods 
     Lane Segmentation  -> Unet 
-<h1><center> <img src="notebook/images/model.png">  </center></h1>
+    
+<p align="center">
+ <img src="notebook/images/model.png">
+</p>
 
     Traffic Sign Detection -> YOLO 
 <h1><center>    </center></h1>
@@ -98,11 +101,11 @@ python client.py
 - [Kết quả vòng chung kết (demo)](https://www.youtube.com/watch?v=bjkq4dZFzao)
 - [Kết quả vòng chung kết](https://youtu.be/gxPUKQGJaiI)
 ## Awards  
-<h1><center> <img src=/home/hiu/Desktop/CDS/CDS_UTE_2023/notebook/images/lum.jpg> </center></h1>
+<h1><center> <img src="notebook/images/lum.jpg"> </center></h1>
 
 ## Trophy
 
-<h1><center> <img width=60% src=/home/hiu/Desktop/CDS/CDS_UTE_2023/notebook/images/cup.jpg > </center></h1>
+<h1><center> <img width=60% src="notebook/images/cup.jpg" > </center></h1>
 
 
 
